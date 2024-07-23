@@ -1,9 +1,35 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view />
+  <div id="app">
+    <header>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+          <router-link to="/" class="navbar-brand">
+            Управление оборудованием
+          </router-link>
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <router-link to="/" class="nav-link"> Оборудование </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link to="/equipment-types" class="nav-link">
+                Типы оборудования
+              </router-link>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <router-view />
+    </main>
+
+    <footer class="footer mt-5 py-3 bg-light">
+      <div class="container text-center">
+        © {{ new Date().getFullYear() }} Мое приложение
+      </div>
+    </footer>
+  </div>
 </template>
 
 <style>
