@@ -3,6 +3,9 @@
     <div class="row">
       <div class="col-md-8 offset-md-2">
         <h2>Создать оборудование</h2>
+        <div v-for="error in errors" :key="error.id" class="text-danger">
+          {{ errors }}
+        </div>
 
         <form @submit.prevent="createEquipment">
           <div
@@ -13,6 +16,9 @@
             <div class="card mb-3">
               <div class="card-body">
                 <h5 class="card-title">Оборудование {{ index + 1 }}</h5>
+                <div v-if="serverErrors[index]" class="alert alert-danger mb-2">
+                  {{ serverErrors[index].message }}
+                </div>
                 <button
                   v-if="equipments.length > 1"
                   @click.prevent="removeEquipment(index)"
@@ -41,12 +47,6 @@
                       {{ type.name }}
                     </option>
                   </select>
-                  <div
-                    v-if="errors[`equipments.${index}.equipment_type_id`]"
-                    class="text-danger"
-                  >
-                    {{ errors[`equipments.${index}.equipment_type_id`] }}
-                  </div>
                 </div>
 
                 <div class="form-group">
@@ -113,8 +113,9 @@ export default {
           serial_number: "",
           desc: "",
         },
-      ], // Массив для хранения данных нового оборудования
-      errors: {},
+      ],
+      errors: [],
+      serverErrors: [],
     };
   },
   async mounted() {
@@ -137,7 +138,8 @@ export default {
       this.equipments.splice(index, 1);
     },
     async createEquipment() {
-      this.errors = {};
+      this.errors = [];
+      this.serverErrors = [];
 
       // Валидация на стороне клиента
       this.equipments.forEach((equipment, index) => {
@@ -156,14 +158,17 @@ export default {
       }
 
       try {
-        await axios.post("/equipment", this.equipments);
-        this.$router.push({ name: "EquipmentList" });
-      } catch (error) {
-        if (error.response && error.response.data.errors) {
-          this.errors = error.response.data.errors;
+        const response = await axios.post("/equipment", this.equipments);
+
+        // Обработка ответа от сервера
+        if (response.data.errors) {
+          this.serverErrors = response.data.errors;
         } else {
-          console.error("Ошибка при создании оборудования:", error);
+          this.$router.push({ name: "EquipmentList" });
         }
+      } catch (error) {
+        this.errors.push(error.message);
+        console.error("Ошибка при создании оборудования:", error);
       }
     },
   },
