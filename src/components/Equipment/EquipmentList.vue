@@ -12,6 +12,74 @@
           </router-link>
         </div>
 
+        <div class="mb-3">
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Поиск по всем полям..."
+              v-model="filters.q"
+              @input="onSearchInput"
+            />
+            <div class="input-group-append">
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                @click="searchEquipment"
+              >
+                Поиск
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="serial-number">Серийный номер:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="serial-number"
+                v-model="filters.serial_number"
+                @input="onSearchInput"
+              />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="equipment-type-id">Тип оборудования:</label>
+              <select
+                class="form-control"
+                id="equipment-type-id"
+                v-model.number="filters.equipment_type_id"
+                @change="onSearchInput"
+              >
+                <option value="">Все типы</option>
+                <option
+                  v-for="type in equipmentTypes"
+                  :key="type.id"
+                  :value="type.id"
+                >
+                  {{ type.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="description">Описание:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="description"
+                v-model="filters.desc"
+                @input="onSearchInput"
+              />
+            </div>
+          </div>
+        </div>
+
         <div v-if="isLoading">
           <div class="alert alert-info">Загрузка...</div>
         </div>
@@ -94,10 +162,18 @@ export default {
       currentPage: 1,
       isLoading: false,
       error: null,
+      filters: {
+        q: "",
+        serial_number: "",
+        equipment_type_id: "",
+        desc: "",
+      },
+      equipmentTypes: [],
     };
   },
   mounted() {
     this.fetchEquipmentList();
+    this.fetchEquipmentTypes();
   },
   methods: {
     async fetchEquipmentList(page = 1) {
@@ -106,7 +182,10 @@ export default {
 
       try {
         const response = await axios.get("/equipment", {
-          params: { page },
+          params: {
+            page,
+            ...this.filters, // Передайте все фильтры в запросе
+          },
         });
 
         this.equipmentList = response.data.data;
@@ -117,6 +196,14 @@ export default {
         console.error(error);
       } finally {
         this.isLoading = false;
+      }
+    },
+    async fetchEquipmentTypes() {
+      try {
+        const response = await axios.get("/equipment-type");
+        this.equipmentTypes = response.data.data;
+      } catch (error) {
+        console.error("Ошибка при загрузке типов оборудования:", error);
       }
     },
     async deleteEquipment(id) {
@@ -132,7 +219,16 @@ export default {
     onPageChanged(page) {
       this.fetchEquipmentList(page);
     },
+    onSearchInput() {
+      // Необязательная задержка перед выполнением запроса
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = setTimeout(() => {
+        this.fetchEquipmentList();
+      }, 300);
+    },
+    searchEquipment() {
+      this.fetchEquipmentList(); // Загрузите данные с учетом строки поиска
+    },
   },
 };
 </script>
-../AppPagination.vue
