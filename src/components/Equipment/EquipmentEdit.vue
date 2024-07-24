@@ -103,6 +103,8 @@ export default {
       try {
         const response = await axios.get("/equipment-type");
         this.equipmentTypes = response.data.data;
+        const equipmentTypeId = this.localEquipment.equipment_type.id;
+        this.localEquipment.equipment_type_id = equipmentTypeId;
       } catch (error) {
         console.error("Ошибка при загрузке типов оборудования:", error);
       }

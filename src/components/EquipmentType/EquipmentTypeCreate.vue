@@ -4,6 +4,9 @@
       <div class="col-md-6 offset-md-3">
         <h2>Создать тип оборудования</h2>
 
+        <div v-if="errors.global" class="text-danger">
+          {{ errors.global }}
+        </div>
         <form @submit.prevent="createEquipmentType">
           <div class="form-group">
             <label for="name">Наименование:</label>
@@ -74,7 +77,7 @@ export default {
         this.$router.push({ name: "EquipmentTypeList" });
       } catch (error) {
         if (error.response && error.response.data.errors) {
-          this.errors = error.response.data.errors;
+          this.errors.global = error.message;
         } else {
           console.error("Ошибка при создании типа оборудования:", error);
         }
