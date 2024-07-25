@@ -48,6 +48,18 @@
           </div>
           <div class="col-md-4">
             <div class="form-group">
+              <label for="serial-number">Маска оборудования:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="serial-number"
+                v-model="filters.mask"
+                @input="onSearchInput"
+              />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
               <label for="equipment-type-id">Тип оборудования:</label>
               <select
                 class="form-control"
@@ -92,6 +104,7 @@
               <tr>
                 <th>ID</th>
                 <th>Тип оборудования</th>
+                <th>Маска оборудования</th>
                 <th>Серийный номер</th>
                 <th>Описание</th>
                 <th>Действия</th>
@@ -101,6 +114,7 @@
               <tr v-for="equipment in equipmentList" :key="equipment.id">
                 <td>{{ equipment.id }}</td>
                 <td>{{ equipment.equipment_type.name }}</td>
+                <td>{{ equipment.equipment_type.mask }}</td>
                 <td>{{ equipment.serial_number }}</td>
                 <td>{{ equipment.desc }}</td>
                 <td>
@@ -165,6 +179,7 @@ export default {
       filters: {
         q: "",
         serial_number: "",
+        mask: "",
         equipment_type_id: "",
         desc: "",
       },
